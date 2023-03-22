@@ -33,13 +33,14 @@ met_vals%>%
   group_by(conc)%>%
   summarise(mean = mean(abs),
             sd = sd(abs))%>%
-  left_join(met_vals)%>%
-  mutate(conc_log = log(conc))->met_vals2
+  left_join(met_vals)->met_vals2
 
 
 
 
+#plotting
 met_vals2%>%
+  mutate(conc_log = log(conc))%>%
   
   ggplot(aes(conc_log, abs))+
   geom_point(shape = 21, size = 2, stroke = 1.5, alpha = .3)+
