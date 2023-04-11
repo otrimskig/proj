@@ -5,45 +5,33 @@ library(ggplot2)
 
 
 
-#read_excel("20230317-met.xlsx")->met
-
-readRDS("2023-03-22_12-59-drive_import.rds")->met
-
-
+readRDS("2023-03-31-Metformin Neuro.rds")->met
 
 
 met%>%
-  select(2:last_col())%>%
-  select(-tail(names(.), 4))%>%
-  rename(xrow = 1)%>%
-  clean_names()->met2
 
-
-met2%>%
-  slice(1:8)%>%
-  pivot_longer(2:last_col(), "xcol", values_to = "conc")->met_conc
-
-met2%>%
-  slice(-c(1:8))%>%
-  slice(-c(1:2))%>%
-  pivot_longer(2:last_col(), "xcol", values_to = "abs")%>%
-  left_join(met_conc)->met_vals
- 
-met_vals%>%
-  group_by(conc)%>%
-  summarise(mean = mean(abs),
-            sd = sd(abs))%>%
-  left_join(met_vals)->met_vals2
-
+  group_by(concentration)%>%
+  summarise(mean = mean(luminescence),
+            sd = sd(luminescence))%>%
+  
+  left_join(met)%>%
+  mutate(conc_log = log(concentration+.01))%>%
+  rename(conc = concentration)%>%
+  rename(lum = luminescence)%>%
+  mutate(conc_lum = log(lum+.01))%>%
+  filter(!is.na(conc))->met2
 
 
 
 #plotting
-met_vals2%>%
-  mutate(conc_log = log(conc))%>%
-  
-  ggplot(aes(conc_log, abs))+
-  geom_point(shape = 21, size = 2, stroke = 1.5, alpha = .3)+
-  geom_point(aes(conc_log, mean), color = "red")+
+met2%>%
+  ggplot(aes(conc_log, lum))+
+  geom_point(shape = 21, size = .5, alpha = .3)+
+  geom_point(aes(conc_log, mean), size = 1.5, color = "red")+
   theme_classic()
   
+met2%>%
+  ggplot(aes(conc, lum))+
+  geom_point(shape = 21, size = 2, stroke = 1.5, alpha = .3)+
+  geom_point(aes(y = mean), color = "red")+
+  theme_classic()
