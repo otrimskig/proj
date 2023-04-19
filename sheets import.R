@@ -4,6 +4,14 @@ library(tidyverse)
 library(janitor)
 library(lubridate)
 
+
+#######title of file
+
+title<-"linenames"
+
+############
+
+
 #authorize user
 gs4_auth(email = "gotrimski@gmail.com")
 
@@ -20,7 +28,7 @@ sheets_df%>%
                           gsub(" ", "_", .)%>%
                           gsub('.{3}$', '', .),
                         
-                        "-", "drive_import.rds"))
+                        "-", title, ".rds"))
 #############################################################
 
 #sheets_df%>%
