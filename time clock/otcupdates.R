@@ -110,7 +110,7 @@ otc_year%>%
 
 
 
-
+#original, unaltered pay periods: 
 read_rds("pp_year23.rds")->pp_year
 
 
