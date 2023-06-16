@@ -9,7 +9,7 @@ library(lubridate)
 gs4_auth(email = "gotrimski@gmail.com")
 
 #read input sheet
-w96_df<-read_sheet("12NUnpmY9GzYT31EfhmvQFXkvBaSehO7420PTCk_eyTs", 
+w96_df<-read_sheet("1fWmrqMvHrMEyZspyQYy62oTfg1Ev9WLp2McYtydOX5s", 
                       sheet = "input")
 
 ###############################
@@ -82,6 +82,22 @@ left_join(w96.layout, w96.measured)%>%
 ################################
 ################################
 ################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #save to RDS file.
 w96_all%>%

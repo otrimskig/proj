@@ -124,6 +124,12 @@ otc_year2%>%
 
 
 
+#get in manual corrections. 
+read_sheet("https://docs.google.com/spreadsheets/d/1EMKP1T11kPVPc2-wmztRzEPNngxkw0rcAkpz09I3rFA/edit#gid=1911378700", 
+           sheet = "corrections")%>%
+  select(1,2)->corrections
+
+
 
 
 
@@ -133,7 +139,10 @@ otc_year2%>%
 
 #all time punches
 otc_year3%>%
+  full_join(corrections)%>%
+ 
   mutate(date = date(in_time))%>%
+ 
   left_join(pp_year)%>%
   relocate(pp_num, date, type)%>%
   select(1:5)%>%
