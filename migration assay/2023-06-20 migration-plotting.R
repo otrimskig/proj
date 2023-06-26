@@ -9,32 +9,15 @@ library(ggpubr)
 
 
 
-
-
-readRDS("all_mig_exp.rds")->all_exp2
-
-#export for non-R users
-all_exp2%>%
-  select(date,
-         line_num,
-         line_name,
-         abs_590,
-         abs_590_raw)%>%
-  write_csv("GO_all_migrations.csv")
-
-
-
-
-library(RColorBrewer)
-palette_colors<-brewer.pal(n=6,"Accent")
+all_exp2<-readRDS("all_mig_exp.rds")%>%
+  filter(date!=20230412)
 
 group.colors.name <- c("YUMM 3.2 pten -/- ; HA-AKT1-E17K" = "#7FC97F", 
-                  "YUMM 3.2 pten -/- ; HA-FAK (wt)" = "#BEAED4", 
-                 "YUMM 3.2 pten -/- ; HA-FAK-K454R" ="#FDC086", 
-                  "YUMM 3.2 pten -/- ; HA-FAK-Y394E" = "#5bf4fc", 
-                 "YUMM 3.2 pten -/- ; HA-ndel-FAK"= "#386CB0",
-                  "YUMM 3.2 pten -/- ; Parental" = "#F0027F")
-
+                       "YUMM 3.2 pten -/- ; HA-FAK (wt)" = "#BEAED4", 
+                       "YUMM 3.2 pten -/- ; HA-FAK-K454R" ="#FDC086", 
+                       "YUMM 3.2 pten -/- ; HA-FAK-Y394E" = "#5bf4fc", 
+                       "YUMM 3.2 pten -/- ; HA-ndel-FAK"= "#386CB0",
+                       "YUMM 3.2 pten -/- ; Parental" = "#F0027F")
 
 
 ####"normalized to mean of non-migrated cells, per line per day"
@@ -112,12 +95,6 @@ line_counts<-all_exp2%>%
 all_dates_sum<-left_join(total_means, line_counts)%>%
   mutate(se = sd/sqrt(n))
 
-#export for non-R users
-all_dates_sum%>%
-  write_csv("GO_all_migrations_summary_data.csv")
-
-
-
 
 all_dates_sum$line_name <- reorder(all_dates_sum$line_name, 
                                    all_dates_sum$abs_mean)
@@ -143,16 +120,12 @@ ggplot(all_dates_sum, aes(x = line_name, y = abs_mean, fill = line_name))+
 
 
 attach(all_exp2)
-t_tests1<-pairwise.t.test(abs_590,
+pairwise.t.test(abs_590,
                 g = line_name,
                 p.adjust.method = "none")
 detach()
 
-t_tests1[["p.value"]]%>%
-  as_tibble(rownames = NA)%>%
-  rownames_to_column(var = "line_name")%>%
-  write_csv("ttests1.csv")
-  # view()
+
 
 #########non-normalized exclude last experiment
 
@@ -182,3 +155,6 @@ ggplot(all_exp4, aes(x = line_name, y = abs_590, color = as.factor(date)))+
 
 
 
+
+library(RColorBrewer)
+palette_colors<-brewer.pal(n=6,"Accent")

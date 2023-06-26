@@ -2,71 +2,42 @@ library(tidyverse)
 library(janitor)
 library(lubridate)
 
-#use nums, not chars for dates. 
 
-
-readRDS("2023-04-04-migration.rds")%>%
-  mutate(date = 20230404)->mig01
-
-readRDS("2023-04-12-migration.rds")%>%
-  mutate(date = 20230412)->mig02
-
-readRDS("2023-04-24-migration.rds")%>%
-  mutate(date = 20230424)->mig03
-
-
-str(mig01)
-
-str(mig02)
-
-str(mig03)
+readRDS("migration assay/2023-04-19_13-03-migration0412.rds")->mig
 
 
 
-mget(ls(pattern = "mig"))->migs123
+mig%>%
+  view()
 
-tease<-function(x){clean_names(x)%>%
-    mutate(x,sample_name = as.character(sample_name))}
+readRDS("2023-05-05-migration assay 20230426 plate read abs 590 nm.rds")%>%
+  mutate(date = "20230505")%>%
+  left_join(mig)->mig
 
 
 
-lapply(migs123, tease)->migsnew
-  
-
-reduce(migsnew, full_join)
 
 
 mig%>%
   clean_names()%>%
-  #subtract blank value from abs. 
   mutate(abs_fixed = abs_590 - .044)%>%
-  #remove blank sample from ds. 
   filter(sample_name!="blank")%>%
-  
-  #reformatting
-  #get sample num from sample name. 
   mutate(sample_num = substr(sample_name, 1,1))%>%
-  #type subset for wells that were not wiped apically. 
   mutate(type = ifelse(grepl(".2", sample_name), "total", "mig"))->mig1
   
 
-#get "total" avg absorbance for wells not wiped, per condition per date. 
+
+
 mig1%>%
   filter(type == "total")%>%
   group_by(date, sample_name)%>%
-  #get mean for each group. 
   summarise(tot_mean = mean(abs_fixed))%>%
-  
-  
   mutate(sample_num = substr(sample_name, 1,1))%>%
   select(-sample_name)->totals
 
 
 mig1
-totals%>%
-  view()
-
-
+totals
 mig1%>%
   filter(type == "mig")%>%
   left_join(totals, by = c("date", "sample_num"))%>%
@@ -74,7 +45,7 @@ mig1%>%
   rename(line_num = sample_num)->mig_all
 
 
-readRDS("2023-04-19_13-40-linenames.rds")->lines
+readRDS("migration assay/2023-04-19_13-40-linenames.rds")->lines
 
 
 
