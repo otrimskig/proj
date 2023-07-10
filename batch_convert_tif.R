@@ -9,9 +9,8 @@ library(tools)
 
 
 #input (and output) directory
-#setwd("C://Users//u1413890//OneDrive - University of Utah//garrett hl-onedrive//experiment files//")
+setwd("C://Users//u1413890//OneDrive - University of Utah//garrett hl-onedrive//experiment files//")
 
-setwd("E://incucyte data//2023-07-05 scratch test//")
 
 
 
@@ -33,8 +32,8 @@ tif_df<-dir_info()%>%
   #change modification time to date. Filter for TODAY. 
   
   
-  # mutate(modification_time = as.Date(modification_time))%>%
-  # filter(modification_time == today())%>%
+  mutate(modification_time = as.Date(modification_time))%>%
+  filter(modification_time == today())%>%
   
 
   
