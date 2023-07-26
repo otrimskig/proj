@@ -33,9 +33,12 @@ tif_df<-dir_info()%>%
   
   
   mutate(modification_time = as.Date(modification_time))%>%
-  filter(modification_time == today())%>%
   
-
+  
+  
+  filter(modification_time > today()-7)%>%
+  
+  filter(modification_time == today())%>%
   
   
   #find file extension for each file. remove if not a tiff/tif. 
