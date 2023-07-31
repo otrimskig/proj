@@ -1,55 +1,83 @@
 
-attributes(pairwise_results[["p.value"]])[["dimnames"]][[1]]->group_a
+
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(magrittr)
+library(stats)
+
+
+#read in main data
+readRDS("all_invasion.rds")->inv_df
+
+
+#df of all lines in experiment plus corresponding line number. 
+lines<-inv_df%>%
+  select(line_num, line_name)%>%
+  group_by(line_num)%>%
+  slice(1)%>%
+  ungroup()
+
+
+
+#finding p-value.Run stats analysis
+attach(inv_df)
+pairwise_results<-pairwise.t.test(#testing parameter (observation) 
+  abs_590, 
+  #grouping
+  line_name, 
+  #adjustment method
+  p.adjust.method = "none")
+detach()
 
 
 
 pairwise_results[["p.value"]]%>%
   as_tibble()%>%
-  
-  mutate(group_a = group_a)%>%
-  relocate(group_a)%>%
-  
-  
-  
-  pivot_longer(cols=2:7, names_to = "group_b", values_to = "p_value")%>%
+  mutate(group_2 = attributes(pairwise_results[["p.value"]])[["dimnames"]][[1]])%>%
+  relocate(group_2)%>%
+  pivot_longer(cols=2:last_col(), names_to = "group_1", values_to = "p_value")%>%
+  relocate(group_1)%>%
   filter(!is.na(p_value))%>%
+  arrange(group_1, group_2)->all_results
+
+
+
+all_results%>%
+  arrange(p_value)->p_values
+
+
+all_results_1<-all_results
+all_results_2<-all_results%>%
+  relocate(group_2)%>%
+  rename(group_1 = group_2, group_2 = group_1)
+
+
+full_join(all_results_1, all_results_2)%>%
   
   
-  mutate(group_c = group_a)->table
-
-
-table%>%
-  select(group_a, group_b, p_value)->tableab
-
-table%>%
-  select(group_b, group_c, p_value)%>%
-  rename(group_a=group_b, group_b=group_c)->tablebc
-
-full_join(tableab, tablebc)%>%
-  
-  
-  
-  pivot_wider(names_from = "group_b", values_from = "p_value")->all_ps
+  pivot_wider(names_from = "group_2", values_from = "p_value")%>%
+  relocate(group_1, last_col())%>%
+  rename(group = group_1)%>%
+  column_to_rownames(var = "group")->results_table
 
 
 
 
+library(openxlsx)
 
-# rename(group_name = group_a)%>%
-# mutate(num = c(1:6))%>%
-# 
-# relocate(group_name, num)%>%
-# 
-# 
-# rename_at(vars(3:last_col()), ~as.character(c(1:6)))
+wb<-createWorkbook()
 
-all_ps%>%
-  pull(group_a)->v
-
-sort(v)
+addWorksheet(wb, sheetName = "results_table")
+writeData(wb, sheet = "results_table", results_table, rowNames = TRUE)
 
 
-all_ps%>%
-  as_tibble()%>%
-  arrange(group_a)%>%
-  view()
+addWorksheet(wb, sheetName = "p_values")
+writeDataTable(wb, sheet = "p_values", p_values)
+
+saveWorkbook(wb, 
+             paste0(Sys.Date(), " ", "invasion_stats", ".xlsx"),
+             overwrite = TRUE)
+
+
+

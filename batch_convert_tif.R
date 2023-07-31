@@ -38,7 +38,7 @@ tif_df<-dir_info()%>%
   
   filter(modification_time > today()-7)%>%
   
-  filter(modification_time == today())%>%
+  #filter(modification_time == today())%>%
   
   
   #find file extension for each file. remove if not a tiff/tif. 
@@ -74,5 +74,5 @@ jpeg_vec<-tif_df%>%
 
 #for loop to convert all tifs to jpegs. 
 for (i in 1:length(tif_vec)){
-writeJPEG(readTIFF(tif_vec[i], native=TRUE), target = jpeg_vec[i], quality = 3)
+writeJPEG(readTIFF(tif_vec[i], native=TRUE), target = jpeg_vec[i], quality = 10)
 }

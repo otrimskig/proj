@@ -5,6 +5,7 @@ library(janitor)
 library(lubridate)
 library(magrittr)
 library(stats)
+library(ggsignif)
 
 #read in data
 readRDS("all_invasion.rds")->inv_df
@@ -65,8 +66,50 @@ ggplot(all_dates_sum, aes(x = line_name, y = abs_mean, fill = line_name))+
                     ymin = abs_mean-se,
                     ymax = abs_mean+se),
                 width =.3,
-                size = .1)
+                size = .1)+
+  # geom_signif(
+  #   comparisons = list(c("YUMM 3.2 Pten -/- ; HA-AKT1-E17K ; Luc/GFP", 
+  #                        "YUMM 3.2 Pten -/- ; HA-ndel-FAK ; Luc/GFP")),
+  #   map_signif_level = FALSE,
+  #   annotations = "poo"
+  # )
+  
+  # geom_signif(
+  #   comparisons = list(c(ttests$groups[[1]])),
+  #   annotations = ttests$expression[[1]],
+  #   map_signif_level = FALSE
+  # )
+
+geom_signif(
+  comparisons = list(c("YUMM 3.2 Pten -/- ; HA-AKT1-E17K ; Luc/GFP", 
+                       "YUMM 3.2 Pten -/- ; HA-ndel-FAK ; Luc/GFP")),
+  annotations = list(~italic(p)[uncorrected]==0.561),
+  map_signif_level = FALSE
+)
 
 
+library(pairwiseComparisons)
+library(statsExpressions) 
 
+
+ttests<-pairwise_comparisons(data = inv_df, 
+                     x = line_name, 
+                     y= abs_590,
+                     type = "parametric",
+                     var.equal = TRUE,
+                     paired = FALSE,
+                     p.adjust.method = "none")%>%
+  
+  dplyr::mutate(groups = purrr::pmap(.l = list(group1, group2), .f = c)) %>%
+  dplyr::arrange(group1)
+
+
+ttests%>%
+  view()
+
+
+ttests$expression[[1]]
+list(ttests$groups[[1]])
+
+ttests$expression[[20]]%>%
 
