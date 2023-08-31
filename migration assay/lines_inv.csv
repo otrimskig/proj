@@ -1,0 +1,8 @@
+exclude,order,line_name,n
+1,2,YUMM 3.2 Pten -/- ; HA-AKT1-E17K ; Luc/GFP,2
+0,6,YUMM 3.2 Pten -/- ; HA-FAK(wt) ; Luc/GFP,2
+0,5,YUMM 3.2 Pten -/- ; HA-FAK-K454R ; Luc/GFP,2
+0,4,YUMM 3.2 Pten -/- ; HA-FAK-Y397E ; Luc/GFP,2
+0,3,YUMM 3.2 Pten -/- ; HA-ndel-FAK ; Luc/GFP,2
+0,1,YUMM 3.2 Pten -/- ; parental ; Luc/GFP,2
+1,7,YUMM 3.2 Pten -/- ; parental ; TVA+,2

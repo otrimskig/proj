@@ -13,14 +13,14 @@ library(ggpubr)
 
 readRDS("all_mig_exp.rds")->all_exp2
 
-#export for non-R users
-all_exp2%>%
-  select(date,
-         line_num,
-         line_name,
-         abs_590,
-         abs_590_raw)%>%
-  write_csv("GO_all_migrations.csv")
+# #export for non-R users
+# all_exp2%>%
+#   select(date,
+#          line_num, 
+#          line_name, 
+#          abs_590,
+#          abs_590_raw)%>%
+#   write_csv("GO_all_migrations.csv")
 
 
 
@@ -136,8 +136,8 @@ ggplot(all_dates_sum, aes(x = line_name, y = abs_mean, fill = line_name))+
                     ymin = abs_mean-se,
                     ymax = abs_mean+se),
                 width =.3,
-                size = .1)+
-  scale_fill_manual(values=group.colors.name)
+                size = .1)#+
+  #scale_fill_manual(values=group.colors.name)
 
 
 
@@ -149,10 +149,7 @@ t_tests1<-pairwise.t.test(abs_590,
 detach()
 
 t_tests1[["p.value"]]%>%
-  as_tibble(rownames = NA)%>%
-  rownames_to_column(var = "line_name")%>%
-  write_csv("ttests1.csv")
-  # view()
+  as_tibble(row_names = TRUE)
 
 #########non-normalized exclude last experiment
 

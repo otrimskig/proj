@@ -5,7 +5,6 @@ library(janitor)
 library(lubridate)
 library(magrittr)
 library(stats)
-library(ggsignif)
 
 #read in data
 readRDS("all_invasion.rds")->inv_df
@@ -66,50 +65,75 @@ ggplot(all_dates_sum, aes(x = line_name, y = abs_mean, fill = line_name))+
                     ymin = abs_mean-se,
                     ymax = abs_mean+se),
                 width =.3,
-                size = .1)+
-  # geom_signif(
-  #   comparisons = list(c("YUMM 3.2 Pten -/- ; HA-AKT1-E17K ; Luc/GFP", 
-  #                        "YUMM 3.2 Pten -/- ; HA-ndel-FAK ; Luc/GFP")),
-  #   map_signif_level = FALSE,
-  #   annotations = "poo"
-  # )
+                size = .1)
+
+
+
+
+
+
+#finding p-value.
+attach(inv_df)
+pairwise_results<-pairwise.t.test(abs_590, line_name, p.adjust.method = "none")
+detach()
+
+
+
+attributes(pairwise_results[["p.value"]])[["dimnames"]][[1]]->group_a
+
+
+
+
+pairwise_results[["p.value"]]%>%
+  as_tibble()%>%
   
-  # geom_signif(
-  #   comparisons = list(c(ttests$groups[[1]])),
-  #   annotations = ttests$expression[[1]],
-  #   map_signif_level = FALSE
-  # )
-
-geom_signif(
-  comparisons = list(c("YUMM 3.2 Pten -/- ; HA-AKT1-E17K ; Luc/GFP", 
-                       "YUMM 3.2 Pten -/- ; HA-ndel-FAK ; Luc/GFP")),
-  annotations = list(~italic(p)[uncorrected]==0.561),
-  map_signif_level = FALSE
-)
-
-
-library(pairwiseComparisons)
-library(statsExpressions) 
-
-
-ttests<-pairwise_comparisons(data = inv_df, 
-                     x = line_name, 
-                     y= abs_590,
-                     type = "parametric",
-                     var.equal = TRUE,
-                     paired = FALSE,
-                     p.adjust.method = "none")%>%
+  mutate(group_a = group_a)%>%
+  relocate(group_a)%>%
+  arrange(group_a)%>%
   
-  dplyr::mutate(groups = purrr::pmap(.l = list(group1, group2), .f = c)) %>%
-  dplyr::arrange(group1)
+
+  pivot_longer(cols=2:7, names_to = "group_b", values_to = "p_value")%>%
+  
+
+  mutate(group_c = group_a)->table
 
 
-ttests%>%
+table%>%
+  select(group_a, group_b, p_value)->tableab
+
+table%>%
+  select(group_b, group_c, p_value)%>%
+  rename(group_a=group_b, group_b=group_c)->tablebc
+
+full_join(tableab, tablebc)%>%
+  filter(!is.na(p_value))%>%
+  pivot_wider(names_from = "group_b", values_from = "p_value")->all_ps
+  
+  
+all_ps%>%
   view()
 
 
-ttests$expression[[1]]
-list(ttests$groups[[1]])
+str(all_ps)
 
-ttests$expression[[20]]%>%
 
+arrange(all_ps, group_a)
+  
+  # rename(group_name = group_a)%>%
+  # mutate(num = c(1:6))%>%
+  # 
+  # relocate(group_name, num)%>%
+  # 
+  # 
+  # rename_at(vars(3:last_col()), ~as.character(c(1:6)))
+
+all_ps%>%
+  pull(group_a)->v
+
+sort(v)
+
+
+all_ps%>%
+  as_tibble()%>%
+  arrange(group_a)%>%
+  view()
