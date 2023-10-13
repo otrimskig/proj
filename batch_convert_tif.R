@@ -52,9 +52,25 @@ tif_df<-dir_info()%>%
   #create variable of fs::path for origin tif files, as character string.
   mutate(tif_path = as.character(path))%>%
   
+  
+  ##
+  ##
+  #cleaning up file names to rename them in consistent manner. 
+  #edit this if file naming scheme changes. 
+  ##
+  ##
+  mutate(new_path= sub("^23[0-9]{4}","", tif_path))%>%
+  mutate(new_path= sub("^2023[0-9]{4}","", new_path))%>%
+  mutate(new_path= paste0(as.character(modification_time), new_path))%>%
+
+
+
+
+
+  
   #take the tif input files and change the filename extensions to jpeg. 
-  mutate(jpeg_path = sub(".tiff", ".jpeg", tif_path))%>%
-  mutate(jpeg_path = sub(".tif", ".jpeg", tif_path))%>%
+  mutate(jpeg_path = sub(".tiff", ".jpeg", new_path))%>%
+  mutate(jpeg_path = sub(".tif", ".jpeg", new_path))%>%
   mutate(jpeg_path = paste0("conv/", jpeg_path))
   
 

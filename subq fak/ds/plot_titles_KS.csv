@@ -1,0 +1,17 @@
+variable,y_axis_lab,plot title
+tcell_percent_live,% Live,T Cells
+tcell_percent_live_cd45,% Live CD45,T Cells
+cd4_percent_live,% Live,CD4 T Cells
+cd4_percent_live_cd45,% Live CD45,CD4 T Cells
+cd4_percent_t_cell,% T Cell,CD4 T Cells
+cd4_pd1_percent_live,% Live,CD4 PD1+
+cd4_pd1_percent_live_cd45,% Live CD45,CD4 PD1+
+cd4_pd1_percent_t_cell,% T Cell,CD4 PD1+
+cd4_pd1_percent_cd4,% CD4,CD4 PD1+
+cd8_percent_live,% Live,CD8 T Cells
+cd8_percent_live_cd45,% Live CD45,CD8 T Cells
+cd8_percent_t_cell,% T Cell,CD8 T Cells
+cd8_pd1_percent_live,% Live,CD8 PD1+
+cd8_pd1_percent_live_cd45,% Live CD45,CD8 PD1+
+cd8_pd1_percent_t_cell,% T Cell,CD8 PD1+
+cd8_pd1_percent_cd8,% CD8,CD8 PD1+
