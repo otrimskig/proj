@@ -4,17 +4,23 @@ library(lubridate)
 library(hms)
 
 
-pp23.1<-read_sheet("https://docs.google.com/spreadsheets/d/1EMKP1T11kPVPc2-wmztRzEPNngxkw0rcAkpz09I3rFA/edit#gid=0", sheet = "pp24")
+pp.1<-read_sheet("https://docs.google.com/spreadsheets/d/1EMKP1T11kPVPc2-wmztRzEPNngxkw0rcAkpz09I3rFA/edit#gid=0", 
+                   
+####!!! #change sheet for year.       
+                   
+                   sheet = "pp24")
 
-pp23.1%>%
+pp.1%>%
   select(1:2)%>%
   pivot_longer(c(1:2), names_to = "type", values_to = "date")%>%
   filter(type == "pp_start")%>%
   mutate(pp_num = row_number())->pps
 
 
+#####!!! 
+#change dates. 
 
-seq(as.Date("2023/01/01"), as.Date("2023/12/31"), "days")%>%
+seq(as.Date("2024/01/01"), as.Date("2024/12/31"), "days")%>%
   as_tibble()%>%
   rename(date = value)%>%
   left_join(pps)%>%
@@ -23,11 +29,11 @@ seq(as.Date("2023/01/01"), as.Date("2023/12/31"), "days")%>%
 
 
 
-pp23.1%>%
+pp.1%>%
   select(3,4)->hols
 
-
-
+pp_year
+hols
 pp_year%>%
   left_join(hols)%>%
   mutate(wkday = wday(date, label = TRUE))%>%
@@ -57,14 +63,9 @@ pp_year%>%
 
 
 
-
-pp_year%>%
-  view()
-
-
-pp_year2%>%
-  view()
+###!!!
+###change year
 
 
 
-write_rds(pp_year2, "pp_year23.rds")
+write_rds(pp_year2, "pp_year24.rds")
