@@ -31,7 +31,7 @@ otc.new<-read_sheet("https://docs.google.com/spreadsheets/d/1EMKP1T11kPVPc2-wmzt
 ####!!!
 #change date for each year
   
-  mutate(date = gsub(",", "/24", date))%>%
+  mutate(date = gsub(",", "/25", date))%>%
   mutate(date = mdy(date))%>%
   mutate(duration = gsub("m", "M", duration))%>%
   mutate(duration = as.period(duration))%>%
@@ -58,9 +58,6 @@ otc.new<-read_sheet("https://docs.google.com/spreadsheets/d/1EMKP1T11kPVPc2-wmzt
   select(-2)%>%
   rename(in_time = in_full, out_time = out_full)%>%
   mutate(duration_mins = as.numeric(out_time - in_time))%>%
-  filter(duration_mins>=0)%>%
-  
-
   select(-duration_mins)->otc_new1
 
 
@@ -75,7 +72,7 @@ otc.new<-read_sheet("https://docs.google.com/spreadsheets/d/1EMKP1T11kPVPc2-wmzt
 ####!!!
 #change sheet for year
 otc_year<-read_sheet("https://docs.google.com/spreadsheets/d/1EMKP1T11kPVPc2-wmztRzEPNngxkw0rcAkpz09I3rFA/edit#gid=1911378700", 
-                    sheet = "2024")
+                    sheet = "2025")
 
 
 otc_year%>%
@@ -106,7 +103,7 @@ otc_year%>%
   #change date for year
   
   
-  mutate(date = gsub(",", "/24", date))%>%
+  mutate(date = gsub(",", "/25", date))%>%
   mutate(date = mdy(date))%>%
   mutate(duration = gsub("m", "M", duration))%>%
   mutate(duration = as.period(duration))%>%
@@ -132,8 +129,6 @@ otc_year%>%
   select(-2)%>%
   rename(in_time = in_full, out_time = out_full)%>%
   mutate(duration_mins = as.numeric(out_time - in_time))%>%
- 
-  
   select(-duration_mins)->otc_year2
 
 
@@ -141,7 +136,7 @@ otc_year%>%
 #change year
 
 #original, unaltered pay periods: 
-read_rds("pp_year24.rds")->pp_year
+read_rds("pp_year25.rds")->pp_year
 
 
 
@@ -183,9 +178,9 @@ otc_year3%>%
 
 
 ####!!!
-#change year
+# change year
 # 
-# range_write(otc_year4,
+# range_write(otc_year24,
 #             ss= "https://docs.google.com/spreadsheets/d/1tKUUyoX9Gufif4kHrN0rivxfPp6jSnzN6Qzv7nPiw0A/edit#gid=698193423",
 #             sheet = "2024",
 #             range = "A3",
@@ -201,52 +196,43 @@ otc_year3%>%
 #daily hours vs. expected
 
 otc_year4%>%
-  mutate(sec_worked = out_time - in_time)%>%
+  mutate(hrs_worked = out_time - in_time)%>%
 
-  mutate(sec_worked = ifelse(is.na(sec_worked), 0, sec_worked))%>%
-
-
-  arrange(date)%>%  
   
-  ###!!!
-  #change date. filters out any corrections or times from prev. years.
-  filter(grepl("2024", date))%>%
   
+###!!!
+  #change date. filters out any corrections or times from prev. years. 
+
+  filter(grepl("2025", date))%>%
+  
+  
+  filter(hrs_worked!=0)%>%
 
 
   group_by(date)%>%
   
-  summarise(sec_worked = as.numeric(sum(sec_worked)))%>%
+  summarise(hrs_worked = as.numeric(sum(hrs_worked)))%>%
   
-  #24 factor is to convert correctly into google sheets.
-  mutate(hrs_worked = sec_worked/60/24)%>%
-  
-  
-  
-  
- 
 
-
-  filter(sec_worked!=0)%>%  
- 
+  
+  
   full_join(pp_year)%>%
+  arrange(date)%>%
 
-  mutate(hrs_worked=if_else(is.na(hrs_worked), 0, hrs_worked))%>%
   
-  
-  
+  mutate(hrs_worked = ifelse(is.na(hrs_worked), 0, hrs_worked))%>%
 
-
+  
   mutate(expected = ifelse(workday == 1, 8/24, 0))%>%
-
-  select(-sec_worked)%>%
-
+  
+  
+  mutate(hrs_worked = hrs_worked/24/60)%>%
+  
+ 
   relocate(hrs_worked, .after = "workday")%>%
 
 
-  filter(date <= as.Date(today()-1))%>%
-  
-  arrange(date)->otc_update_day
+  filter(date <= as.Date(today()-1))->otc_update_day
   
   
   
@@ -258,8 +244,7 @@ otc_year4%>%
 
 range_write(otc_update_day,
             ss= "https://docs.google.com/spreadsheets/d/1tKUUyoX9Gufif4kHrN0rivxfPp6jSnzN6Qzv7nPiw0A/edit#gid=698193423",
-            sheet = "day24",
+            sheet = "day25",
             range = "A3",
             col_names = FALSE,
             reformat = FALSE)
-
